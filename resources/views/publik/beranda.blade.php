@@ -1,12 +1,9 @@
 @extends('layouts.app')
 
+@section('title', 'Beranda')
+
 @section('content')
     <div class="bg-white rounded-lg border border-gray-200 p-8 shadow-sm">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">
-            Campus Talent &amp; Showcase Hub
-        </h1>
-        <p class="text-gray-600">
-            Fondasi sistem siap
-        </p>
+        <h1 class="text-2xl font-bold text-gray-900">Beranda (sementara)</h1>
     </div>
 @endsection
