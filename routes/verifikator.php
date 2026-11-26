@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\VerifikatorController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Pemilik: Dev3
@@ -16,11 +14,3 @@ Route::middleware(['auth', 'role:verifikator'])
         Route::post('/karya/{karya}/setujui', [VerifikatorController::class, 'setujui'])->name('setujui');
         Route::post('/karya/{karya}/tolak', [VerifikatorController::class, 'tolak'])->name('tolak');
     });
-
-// SEMENTARA - HAPUS SEBELUM PULL REQUEST
-Route::get('/verifikator-dev-login', function () {
-    $user = User::where('role', 'verifikator')->firstOrFail();
-    Auth::login($user);
-
-    return redirect()->route('verifikator.index');
-});
