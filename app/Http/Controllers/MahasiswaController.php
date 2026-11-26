@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Karya;
+use App\Models\Kategori;
+use App\Models\Lampiran;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
 {
@@ -22,5 +26,66 @@ class MahasiswaController extends Controller
 
         // Kirim data karya ke view resources/views/mahasiswa/index.blade.php
         return view('mahasiswa.index', compact('karyas'));
+    }
+
+    /**
+     * Menampilkan halaman form untuk mengunggah karya baru.
+     */
+    public function create(): View
+    {
+        // Ambil semua data kategori untuk pilihan dropdown di form
+        $kategoris = Kategori::orderBy('nama_kategori')->get();
+
+        // Tampilkan view form unggah karya
+        return view('mahasiswa.create', compact('kategoris'));
+    }
+
+    /**
+     * Memvalidasi dan menyimpan karya baru beserta file lampirannya.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        // Validasi input form karya dan file lampiran (maks 5 MB = 5120 KB per file)
+        $validated = $request->validate([
+            'judul' => ['required', 'string', 'max:255'],
+            'ringkasan' => ['required', 'string'],
+            'kategori_id' => ['required', 'exists:kategoris,id'],
+            'link_demo' => ['nullable', 'url', 'max:255'],
+            'link_repo' => ['nullable', 'url', 'max:255'],
+            'lampiran' => ['nullable', 'array'],
+            'lampiran.*' => ['file', 'max:5120', 'mimes:pdf,jpg,jpeg,png,zip,docx'],
+        ]);
+
+        // Simpan data utama karya ke database (isi properti satu per satu agar aman)
+        $karya = new Karya();
+        $karya->user_id = auth()->id();
+        $karya->kategori_id = $validated['kategori_id'];
+        $karya->judul = $validated['judul'];
+        $karya->ringkasan = $validated['ringkasan'];
+        $karya->link_demo = $validated['link_demo'] ?? null;
+        $karya->link_repo = $validated['link_repo'] ?? null;
+        $karya->status = 'menunggu';
+        $karya->save();
+
+        // Jika ada file lampiran yang diunggah, simpan file dan catat ke tabel lampirans
+        if ($request->hasFile('lampiran')) {
+            foreach ($request->file('lampiran') as $file) {
+                // Simpan file fisik ke disk 'public' dalam folder 'lampiran'
+                $path = $file->store('lampiran', 'public');
+
+                // Buat record lampiran yang terhubung ke karya ini
+                $lampiran = new Lampiran();
+                $lampiran->karya_id = $karya->id;
+                $lampiran->nama_file = $file->getClientOriginalName();
+                $lampiran->path = $path;
+                $lampiran->tipe = strtolower($file->getClientOriginalExtension() ?: $file->extension());
+                $lampiran->save();
+            }
+        }
+
+        // Kembali ke halaman daftar karya dengan pesan sukses di session
+        return redirect()
+            ->route('mahasiswa.index')
+            ->with('sukses', 'Karya berhasil diunggah dan sedang menunggu verifikasi.');
     }
 }

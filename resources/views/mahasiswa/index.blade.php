@@ -10,12 +10,19 @@
             </p>
         </div>
 
-        {{-- Tombol sementara menuju "#" karena route unggah karya akan dibuat nanti --}}
-        <a href="#"
+        {{-- Tombol menuju halaman form unggah karya --}}
+        <a href="{{ route('mahasiswa.karya.create') }}"
            class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
             Unggah Karya
         </a>
     </div>
+
+    {{-- Tampilkan notifikasi kotak hijau jika ada pesan sukses dari session --}}
+    @if (session('sukses'))
+        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 shadow-sm">
+            {{ session('sukses') }}
+        </div>
+    @endif
 
     {{-- Cek apakah mahasiswa sudah memiliki karya atau belum --}}
     @if ($karyas->isEmpty())
