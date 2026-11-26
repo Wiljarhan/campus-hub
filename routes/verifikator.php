@@ -12,6 +12,7 @@ Route::middleware(['auth', 'role:verifikator'])
     ->name('verifikator.')
     ->group(function () {
         Route::get('/', [VerifikatorController::class, 'index'])->name('index');
+        Route::get('/karya/{karya}', [VerifikatorController::class, 'show'])->name('show');
     });
 
 // SEMENTARA - HAPUS SEBELUM PULL REQUEST

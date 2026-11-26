@@ -56,7 +56,7 @@
                                         {{ $karya->created_at?->format('d M Y, H:i') ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 text-right whitespace-nowrap">
-                                        <a href="#"
+                                        <a href="{{ route('verifikator.show', $karya) }}"
                                            class="inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition">
                                             Periksa
                                         </a>

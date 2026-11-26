@@ -19,4 +19,14 @@ class VerifikatorController extends Controller
 
         return view('verifikator.index', compact('karyas'));
     }
+
+    /**
+     * Display the specified karya details for verification.
+     */
+    public function show(Karya $karya): View
+    {
+        $karya->load(['mahasiswa', 'kategori', 'lampirans']);
+
+        return view('verifikator.show', compact('karya'));
+    }
 }
