@@ -17,4 +17,15 @@ Route::middleware(['auth', 'role:mahasiswa'])
 
         // Menyimpan karya baru beserta file lampirannya (URL: /mahasiswa/karya)
         Route::post('/karya', [MahasiswaController::class, 'store'])->name('mahasiswa.karya.store');
+
+        // Menampilkan halaman inbox permintaan adopsi dan undangan rekrutmen (URL: /mahasiswa/inbox)
+        Route::get('/inbox', [MahasiswaController::class, 'inbox'])->name('mahasiswa.inbox');
+
+        // Memproses respon mahasiswa (terima/tolak) untuk permintaan adopsi dari UMKM
+        Route::patch('/adopsi/{permintaan}/respon', [MahasiswaController::class, 'responAdopsi'])
+            ->name('mahasiswa.adopsi.respon');
+
+        // Memproses respon mahasiswa (terima/tolak) untuk undangan rekrutmen dari Recruiter
+        Route::patch('/undangan/{undangan}/respon', [MahasiswaController::class, 'responUndangan'])
+            ->name('mahasiswa.undangan.respon');
     });

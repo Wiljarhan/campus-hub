@@ -10,11 +10,20 @@
             </p>
         </div>
 
-        {{-- Tombol menuju halaman form unggah karya --}}
-        <a href="{{ route('mahasiswa.karya.create') }}"
-           class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
-            Unggah Karya
-        </a>
+        {{-- Grup tombol navigasi di bagian atas daftar karya --}}
+        <div class="flex items-center gap-3">
+            {{-- Tautan menuju halaman inbox permintaan adopsi dan undangan rekrutmen --}}
+            <a href="{{ route('mahasiswa.inbox') }}"
+               class="inline-flex items-center justify-center px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-sm font-medium rounded-lg shadow-sm transition">
+                Inbox
+            </a>
+
+            {{-- Tombol menuju halaman form unggah karya --}}
+            <a href="{{ route('mahasiswa.karya.create') }}"
+               class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+                Unggah Karya
+            </a>
+        </div>
     </div>
 
     {{-- Tampilkan notifikasi kotak hijau jika ada pesan sukses dari session --}}

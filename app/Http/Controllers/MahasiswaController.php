@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Karya;
 use App\Models\Kategori;
 use App\Models\Lampiran;
+use App\Models\PermintaanAdopsi;
+use App\Models\UndanganRekrutmen;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -87,5 +89,85 @@ class MahasiswaController extends Controller
         return redirect()
             ->route('mahasiswa.index')
             ->with('sukses', 'Karya berhasil diunggah dan sedang menunggu verifikasi.');
+    }
+
+    /**
+     * Menampilkan daftar permintaan adopsi (UMKM) dan undangan rekrutmen (Recruiter)
+     * untuk karya-karya milik mahasiswa yang sedang login.
+     */
+    public function inbox(): View
+    {
+        $userId = auth()->id();
+
+        // Ambil permintaan adopsi yang karya-nya dimiliki oleh user yang login
+        $permintaanAdopsis = PermintaanAdopsi::with(['karya', 'umkm'])
+            ->whereHas('karya', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->latest()
+            ->get();
+
+        // Ambil undangan rekrutmen yang karya-nya dimiliki oleh user yang login
+        $undanganRekrutmens = UndanganRekrutmen::with(['karya', 'recruiter'])
+            ->whereHas('karya', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->latest()
+            ->get();
+
+        // Kirim kedua daftar ke view resources/views/mahasiswa/inbox.blade.php
+        return view('mahasiswa.inbox', compact('permintaanAdopsis', 'undanganRekrutmens'));
+    }
+
+    /**
+     * Memproses respon mahasiswa (diterima/ditolak) untuk permintaan adopsi.
+     */
+    public function responAdopsi(Request $request, PermintaanAdopsi $permintaan): RedirectResponse
+    {
+        return $this->prosesRespon(
+            $request,
+            $permintaan,
+            'Respon permintaan adopsi berhasil disimpan.'
+        );
+    }
+
+    /**
+     * Memproses respon mahasiswa (diterima/ditolak) untuk undangan rekrutmen.
+     */
+    public function responUndangan(Request $request, UndanganRekrutmen $undangan): RedirectResponse
+    {
+        return $this->prosesRespon(
+            $request,
+            $undangan,
+            'Respon undangan rekrutmen berhasil disimpan.'
+        );
+    }
+
+    /**
+     * Helper bersama untuk memeriksa kepemilikan karya, memvalidasi status,
+     * dan menyimpan respon permintaan adopsi maupun undangan rekrutmen.
+     */
+    private function prosesRespon(
+        Request $request,
+        PermintaanAdopsi|UndanganRekrutmen $item,
+        string $pesanSukses
+    ): RedirectResponse {
+        // Wajib cek bahwa karya terkait milik mahasiswa yang sedang login
+        if ($item->karya?->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Validasi status respon: hanya boleh 'diterima' atau 'ditolak'
+        $validated = $request->validate([
+            'status' => ['required', 'in:diterima,ditolak'],
+        ]);
+
+        // Simpan status baru dan arahkan kembali ke halaman inbox
+        $item->status = $validated['status'];
+        $item->save();
+
+        return redirect()
+            ->route('mahasiswa.inbox')
+            ->with('sukses', $pesanSukses);
     }
 }
