@@ -8,9 +8,38 @@ use App\Models\UndanganRekrutmen;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class EksternalController extends Controller
 {
+    /**
+     * Display the history of adoption requests (UMKM) or recruitment invitations (recruiter).
+     */
+    public function riwayat(): View
+    {
+        $user = Auth::user();
+        $role = $user?->role;
+
+        if ($role === 'umkm') {
+            $riwayats = PermintaanAdopsi::with(['karya.mahasiswa'])
+                ->where('umkm_id', $user->id)
+                ->latest()
+                ->get();
+        } elseif ($role === 'recruiter') {
+            $riwayats = UndanganRekrutmen::with(['karya', 'mahasiswa'])
+                ->where('recruiter_id', $user->id)
+                ->latest()
+                ->get();
+        } else {
+            abort(403);
+        }
+
+        return view('eksternal.riwayat', [
+            'riwayats' => $riwayats,
+            'role' => $role,
+        ]);
+    }
+
     /**
      * Store a new adoption request from a UMKM user for a verified karya.
      */

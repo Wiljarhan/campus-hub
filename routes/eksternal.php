@@ -9,6 +9,10 @@ Route::middleware('auth')
     ->prefix('eksternal')
     ->name('eksternal.')
     ->group(function () {
+        Route::get('/riwayat', [EksternalController::class, 'riwayat'])
+            ->middleware('role:umkm,recruiter')
+            ->name('riwayat');
+
         Route::post('/adopsi/{karya}', [EksternalController::class, 'storeAdopsi'])
             ->middleware('role:umkm')
             ->name('adopsi.store');
