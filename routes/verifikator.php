@@ -13,6 +13,8 @@ Route::middleware(['auth', 'role:verifikator'])
     ->group(function () {
         Route::get('/', [VerifikatorController::class, 'index'])->name('index');
         Route::get('/karya/{karya}', [VerifikatorController::class, 'show'])->name('show');
+        Route::post('/karya/{karya}/setujui', [VerifikatorController::class, 'setujui'])->name('setujui');
+        Route::post('/karya/{karya}/tolak', [VerifikatorController::class, 'tolak'])->name('tolak');
     });
 
 // SEMENTARA - HAPUS SEBELUM PULL REQUEST

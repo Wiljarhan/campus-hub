@@ -11,6 +11,12 @@
             </div>
         </div>
 
+        @if (session('success'))
+            <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
+
         @if ($karyas->isEmpty())
             <div class="bg-white border border-gray-200 rounded-lg p-8 text-center shadow-sm">
                 <p class="text-gray-600">Belum ada karya yang menunggu verifikasi.</p>
